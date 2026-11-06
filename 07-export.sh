@@ -44,7 +44,7 @@ echo "  done"
 echo "  Copying files for Qlever..."
 set -x
 # Data files (renamed from .tsv to .ttl for QLever indexing)
-scp 05-yago-final-schema.ttl yago@yago.r2.enst.fr:/data/qlever/yago-schema.ttl
+scp 05-yago-final-schema-for-qlever.ttl yago@yago.r2.enst.fr:/data/qlever/yago-schema.ttl
 scp 05-yago-final-taxonomy.tsv yago@yago.r2.enst.fr:/data/qlever/yago-taxonomy.ttl
 scp 05-yago-final-wikipedia.tsv yago@yago.r2.enst.fr:/data/qlever/yago-wikipedia.ttl
 scp 05-yago-final-wikipedia-labels.tsv yago@yago.r2.enst.fr:/data/qlever/yago-wikipedia-labels.ttl

@@ -412,7 +412,7 @@ class Graph(object):
     def removeObjects(self, subject, predicate):
         if subject in self.index:
            self.index[subject].pop(predicate, None)
-    def printToWriter(self, result):        
+    def printToWriter(self, result, flattenLists=False):        
         for subject in self.index:
             if subject.startswith("_:list_"):
                 continue
@@ -430,7 +430,7 @@ class Graph(object):
                 for obj in self.index[subject][predicate]:                    
                     if hasPrevious:
                         result.write(', ')
-                    if obj.startswith("_:list_"):
+                    if not flattenLists and obj.startswith("_:list_"):
                         result.write("(")
                         result.write(" ".join(self.getList(obj)))
                         result.write(")")
@@ -438,11 +438,11 @@ class Graph(object):
                         result.write(obj)
                     hasPrevious=True
             result.write(' .\n')
-    def printToFile(self, file):
+    def printToFile(self, file, flattenLists=False):
         with open(file, "wt", encoding="utf-8") as out:
             for p in Prefixes.yagoPrefixes:
                 out.write("@prefix "+p+": <"+Prefixes.prefixes[p]+"> .\n")
-            self.printToWriter(out)
+            self.printToWriter(out, flattenLists)
     def __str__(self):
         buffer=StringIO()
         buffer.write("# RDF Graph\n")

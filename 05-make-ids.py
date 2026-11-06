@@ -301,6 +301,10 @@ with TsvUtils.Timer("Step 05: Renaming YAGO entities"):
     print("done")            
     print("  Writing out schema...", flush=True, end='')
     yagoSchema.writeToFile(FOLDER+"05-yago-final-schema.ttl")
+    # Write out the schema again in flattened form for Qlever
+    schemaGraph=TurtleUtils.Graph()
+    schemaGraph.loadTurtleFile(FOLDER+"05-yago-final-schema.ttl")
+    schemaGraph.printToFile(FOLDER+"05-yago-final-schema-for-qlever.ttl")
     print("done")
     
 if TEST:
