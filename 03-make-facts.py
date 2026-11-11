@@ -544,9 +544,20 @@ def removeAstroLabels(entityFacts, writer):
             entityFacts.remove((mainEntity, Prefixes.rdfsLabel, label))
             writer.writeMetaFact(mainEntity, Prefixes.rdfsLabel, label, Prefixes.ysReason, '"Is invalid label"')
 
+def getSiteLinks(entityFacts):
+    """ Returns the number of site links or zero """
+    _, siteLinks, _, _ = TurtleUtils.splitLiteral(entityFacts.objectOf(entityFacts.mainSubject(), Prefixes.yagoSiteLinks))
+    if siteLinks is None: 
+        return 0
+    return siteLinks
+            
 ##########################################################################
 #             Main method
 ##########################################################################
+
+# Entities that have a higher site link number than this,
+# and that are excluded due to a missing type get a special tag
+SITE_LINK_THRESHOLD=30
 
 class treatWikidataEntity():
     """ Visitor that will handle every Wikidata entity """
@@ -581,7 +592,7 @@ class treatWikidataEntity():
         types = cleanAndReturnTypes(entityFacts, self.yagoSchema, self.yagoTaxonomyUp, self.writer)
         
         if not types:
-            self.writer.writeMetaFact(entityFacts.mainSubject(), Prefixes.rdfType, Prefixes.schemaThing, Prefixes.ysReason, '"No valid type"')
+            self.writer.writeMetaFact(entityFacts.mainSubject(), Prefixes.rdfType, Prefixes.schemaThing, Prefixes.ysReason, Prefixes.noValidTypeTemplate.format(getSiteLinks(entityFacts)))
             return True
 
         handleDomain(entityFacts, self.yagoSchema, types, self.writer)

@@ -467,6 +467,8 @@ intRegex=re.compile('[+-]?[0-9.]+')
 
 def splitLiteral(term):
     """ Returns String value, int value, language, and datatype of a term (or None, None, None, None). No good backslash handling """
+    if not term:
+        return(None, None, None, None)
     match=re.match(intRegex, term)
     if match:
         try:

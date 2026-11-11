@@ -21,11 +21,22 @@ wd:Q_Inconsistent wdt:P31 wd:Q_rock_singer, schema:Organization ; schema:name "I
 wd:Q_Has_no_label wdt:P31 wd:Q_rock_singer .
 
 # Things with invalid types should disappear
-wd:Q_has_no_type wdt:P31 wd:invalid .
+wd:Q_has_no_type wdt:P31 wd:invalid; schema:name "Has no type" .
+
+# Popular things with an invalid type should get a special mention
+data:Q_popular a schema:Dataset ;
+        schema:about wd:Q_popular ;
+        schema:version "2436993096"^^xsd:integer ;
+        schema:dateModified "2025-12-02T04:23:03Z"^^xsd:dateTime ;
+        wikibase:statements "1041"^^xsd:integer ;
+        wikibase:sitelinks "369"^^xsd:integer ;
+        wikibase:identifiers "268"^^xsd:integer .
+
+wd:Q_popular wdt:P31 wd:invalid; schema:name "Has no type and is popular" .
 
 # Site links should be extracted
 data:Q_Elvis a schema:Dataset ;
-        schema:about wd:Q31 ;
+        schema:about wd:Q_Elvis ;
         schema:version "2436993096"^^xsd:integer ;
         schema:dateModified "2025-12-02T04:23:03Z"^^xsd:dateTime ;
         wikibase:statements "1041"^^xsd:integer ;

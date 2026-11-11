@@ -243,46 +243,51 @@ with TsvUtils.Timer("Step 06: Collecting YAGO statistics"):
         wikidata2yago[split[0]]=split[2]
     reasonsForExclusion={}
     predicate2numExcluded={}
-    with open(FOLDER+"06-sample-logs.tsv", "wt", encoding="UTF=8") as sampleFile:
-        for logFile in glob.glob(FOLDER+"*.log"):
-            logFileName=logFile[logFile.rfind("/")+1:]
-            sampleFile.write("# ---- "+logFileName+" ----\n\n")
-            samples=[]
-            reasonsForExclusion[logFileName]={}
-            counter=1 # Start at 1 to avoid randomization artifact
-            for split in TsvUtils.tsvTuples(logFile, "    Sampling from "+logFileName):
-                if len(split)<7:
-                    continue
-                counter+=1                    
-                reason=split[6][1:-1]
-                if reason.startswith("Domain check failed: Subject is rdfs:Class"):
-                    reason="Can't attach property to class"
-                    split[6]=reason
-                elif ": " in reason:
-                    reason=reason[0:reason.find(": ")]                
-                if reason not in reasonsForExclusion[logFileName]:
-                    reasonsForExclusion[logFileName][reason]=0
-                reasonsForExclusion[logFileName][reason]+=1
-                if reason.startswith("Domain check failed"):
-                    if split[2] not in predicate2numExcluded:
-                        predicate2numExcluded[split[2]]=0
-                    predicate2numExcluded[split[2]]+=1    
-                # We sample reasons only from the detailed ones
-                if not ": " in split[6]:
-                    continue
-                if len(samples)<NUM_SAMPLES:
-                    samples.append(split)
-                else:
-                    randomNumber=int(random.random()*counter)
-                    if randomNumber<NUM_SAMPLES:    
-                        samples[randomNumber]=split
-            for sample in samples:
-                sampleFile.write("\t".join(sample)+"\n# ")
-                for i in [1,2,3]:
-                    sampleFile.write(wikidata2yago.get(sample[i],sample[i])+"\t")
-                sampleFile.write("\n\n")
-            if not samples:
-                sampleFile.write("  # no exclusion reasons with details\n\n")              
+    with TsvUtils.TsvFileWriter(FOLDER+"06-missing-popular-entities.tsv") as popularEntitiesFile:
+        with open(FOLDER+"06-sample-logs.tsv", "wt", encoding="UTF=8") as sampleFile:
+            for logFile in glob.glob(FOLDER+"*.log"):
+                logFileName=logFile[logFile.rfind("/")+1:]
+                sampleFile.write("# ---- "+logFileName+" ----\n\n")
+                samples=[]
+                reasonsForExclusion[logFileName]={}
+                counter=1 # Start at 1 to avoid randomization artifact
+                for split in TsvUtils.tsvTuples(logFile, "    Sampling from "+logFileName):
+                    if len(split)<7:
+                        continue
+                    counter+=1                    
+                    reason=split[6][1:-1]
+                    # Popular entities go to the popular-entities file
+                    if reason.startswith("No valid type:") and reason>Prefixes.noValidTypeTemplate.format(30)[1:-1]:
+                        popularEntitiesFile.writeTuple(split)
+                    # Collect classes that can't have properties   
+                    if reason.startswith("Domain check failed: Subject is rdfs:Class"):
+                        reason="Can't attach property to class"
+                        split[6]=reason
+                    elif ": " in reason:
+                        reason=reason[0:reason.find(": ")]                
+                    if reason not in reasonsForExclusion[logFileName]:
+                        reasonsForExclusion[logFileName][reason]=0
+                    reasonsForExclusion[logFileName][reason]+=1
+                    if reason.startswith("Domain check failed"):
+                        if split[2] not in predicate2numExcluded:
+                            predicate2numExcluded[split[2]]=0
+                        predicate2numExcluded[split[2]]+=1    
+                    # We sample reasons only from the detailed ones
+                    if not ": " in split[6]:
+                        continue
+                    if len(samples)<NUM_SAMPLES:
+                        samples.append(split)
+                    else:
+                        randomNumber=int(random.random()*counter)
+                        if randomNumber<NUM_SAMPLES:    
+                            samples[randomNumber]=split
+                for sample in samples:
+                    sampleFile.write("\t".join(sample)+"\n# ")
+                    for i in [1,2,3]:
+                        sampleFile.write(wikidata2yago.get(sample[i],sample[i])+"\t")
+                    sampleFile.write("\n\n")
+                if not samples:
+                    sampleFile.write("  # no exclusion reasons with details\n\n")              
     print("  done")
 
     print("  Writing out statistics... ",end="",flush=True)    

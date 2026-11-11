@@ -196,7 +196,11 @@ yagoPersonName="yago:PersonName"
 
 yagoSiteLinks = "yago:siteLinks"
 
+wikidataSiteLinks = "wikibase:sitelinks"
+
 wikibaseQuantityUnit="wikibase:quantityUnit"
+
+noValidTypeTemplate = '"No valid type: {:06d} site links"'
 
 ##########################################################################
 #             Constants for fact processing

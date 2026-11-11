@@ -8,6 +8,12 @@
 
 # ---- 06-make-statistics\03-make-facts.log ----
 
+<<	wd:Q_has_no_type	rdf:type	schema:Thing	>>	ys:excludedFor	"No valid type: 000000 site links"	.
+# wd:Q_has_no_type	rdf:type	schema:Thing	
+
+<<	wd:Q_popular	rdf:type	schema:Thing	>>	ys:excludedFor	"No valid type: 000369 site links"	.
+# wd:Q_popular	rdf:type	schema:Thing	
+
 <<	wd:Q31	schema:memberOf	schema:Thing	>>	ys:excludedFor	"Domain check failed: Subject is schema:Country, schema:AdministrativeArea, schema:Place and expected types are schema:Person, schema:Organization"	.
 # yago:Belgium	schema:memberOf	schema:Thing	
 
