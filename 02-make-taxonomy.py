@@ -75,12 +75,12 @@ instanceIndicators = {
     "wdt:P3201", # disease identifier
     "wdt:P3720", # disease identifier
     "wdt:P4229", # disease identifier
-    "wdt:P486", # disease identifier
+    # wdt:P486, # removed as per https://github.com/yago-naga/yago-4.6/issues/6
     "wdt:P494", # disease identifier
     "wdt:P5082", # disease identifier
     "wdt:P5270", # disease identifier
     "wdt:P557", # disease identifier
-    "wdt:P686", # disease identifier
+    # "wdt:P686", # removed as per https://github.com/yago-naga/yago-4.6/issues/6
     "wdt:P699", # disease identifier
     "wdt:P7807", # disease identifier
     "wdt:P580"   # start time -> instance of Event
