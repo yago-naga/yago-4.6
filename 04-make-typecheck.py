@@ -95,10 +95,13 @@ def titleFromString(s):
     for c in s:
         if legal(c):
             result+=c
-        elif ord(c)<0x009F: # Punctuation becomes underscore
+        elif c in "\"',.() ": 
+            # Punctuation becomes underscore
             result+='_'
-        else: # Other letters become hyphen
-            result+="-"
+        else: 
+            # Other characters become Hex sequences, to avoid in particular
+            # that "Jakarta!" gets mapped to "Jakarta"
+            result+=hexCode(c)
     # Compress subsequent underscores
     result=re.sub("_+","_",result)
     # Remove trailing underscore
@@ -163,16 +166,17 @@ def writeId(entityGraph, out, isName):
            return
     # Try English Wikipedia first
     label=entityGraph.objectWhere(subject, Prefixes.schemaUrl, lambda s: s.startswith('"https://en.wikipedia.org/wiki/'))
-    if label and tryYagoId(out,subject, titleFromWikipediaPage(label[30:-13]), True):
+    hasWikipediaPage=(label!=None)
+    if label and tryYagoId(out,subject, titleFromWikipediaPage(label[31:-13]), True):
         return
     # Next try the English label 
-    label=entityGraph.objectWhere(subject, Prefixes.rdfsLabel, lambda s: s.endswith("@en")) 
-    if label and tryYagoId(out,subject, titleFromLabel(subject,label[1:-4])):
+    label=entityGraph.objectWhere(subject, Prefixes.rdfsLabel, lambda s: s.endswith("@en"))
+    if label and tryYagoId(out,subject, titleFromLabel(subject,label[1:-4]), hasWikipediaPage):
         return        
     # Try any legible label
     for label in entityGraph.objectsOf(subject, Prefixes.rdfsLabel):
         label=TurtleUtils.splitLiteral(label)[0]
-        if tryYagoId(out,subject, titleFromLabel(subject,label)):
+        if tryYagoId(out,subject, titleFromLabel(subject,label), hasWikipediaPage):
             return        
     # Otherwise write the Wikidata ID
     out.write(subject,"owl:sameAs","yago:"+titleFromWikidataId(subject),". #OTHER")
@@ -340,7 +344,7 @@ with TsvUtils.Timer("Step 04: Type-checking YAGO"):
                     startDate=split[4] if len(split)>4 else ""
                     endDate=split[5] if len(split)>5 else ""                    
                     
-                    if len(entityGraph) and subject!=entityGraph.mainSubject():                          
+                    if len(entityGraph) and subject!=entityGraph.mainSubject():
                         isName=isInstanceOfAny(entityGraph.mainSubject(),[Prefixes.yagoPersonName])
                         writeId(entityGraph, idsFile, isName)
                         # For names, we do not write out any facts, and we remove ourselves from the type hierarchy
